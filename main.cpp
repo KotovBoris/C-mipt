@@ -69,21 +69,21 @@ char* InputString() {
 }
 
 void Push(Node*& current, size_t& size) {
-  Node* new_node = new Node{ InputString(), current };
+  Node* new_node = new Node{InputString(), current};
   current = new_node;
   ++size;
 }
 
 void RequestProcessing(Node*& current, size_t& size, char symbol) {
-  if (symbol == 'b') { //back
+  if (symbol == 'b') {  // back
     SkipChars(4);
     PrintBack(current);
   }
-  if (symbol == 's') { //size
+  if (symbol == 's') {  // size
     SkipChars(4);
     std::cout << size << '\n';
   }
-  if (symbol == 'c') { //clear
+  if (symbol == 'c') {  // clear
     SkipChars(5);
     Clear(current, size);
     current = nullptr;
@@ -91,12 +91,11 @@ void RequestProcessing(Node*& current, size_t& size, char symbol) {
   }
   if (symbol == 'p') {
     symbol = getchar();
-    if (symbol == 'u') { //push
+    if (symbol == 'u') {  // push
       SkipChars(3);
       Push(current, size);
       std::cout << "ok\n";
-    }
-    else { //pop
+    } else {  // pop
       SkipChars(2);
       PrintBack(current);
       current = Pop(current, size);
@@ -111,7 +110,7 @@ int main() {
   while (true) {
     char symbol;
     symbol = getchar();
-    if (symbol == 'e') { //exit
+    if (symbol == 'e') {  // exit
       SkipChars(4);
       Clear(current, size);
       break;
