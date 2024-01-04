@@ -1,45 +1,44 @@
 #include <iostream>
 #include <string.h>
 
-char SkipChars(size_t num) {
-  char trash;
+struct Node {
+  char* string;
+  Node* previous = nullptr;
+};
+
+void SkipChars(size_t num) {
   for (size_t i = 0; i < num; ++i) {
-    trash = std::getchar();
+    getchar();
   }
-  return trash;
 }
 
-void PrintBack(void** current) {
+void PrintBack(Node* current) {
   if (current == nullptr) {
     std::cout << "error\n";
     return;
   }
-  size_t i = 0;
-  while (((char*)current[1])[i] != '!') {
-    std::cout << ((char*)current[1])[i];
-    ++i;
-  }
-  std::cout << '\n';
+
+  std::cout << current->string << '\n';
 }
 
-void** Pop(void** last, size_t& size) {
+Node* Pop(Node* last, size_t& size) {
   if (last == nullptr) {
     return nullptr;
   }
+
   --size;
-  if (last[1] != nullptr) {
-    delete[](char*) last[1];
-  }
-  void** previous = (void**)(last[0]);
+
+  Node* previous = last->previous;
+  delete[] last->string;
   delete[] last;
+
   return previous;
 }
 
-void** Clear(void** current, size_t& size) {
+void Clear(Node* current, size_t& size) {
   while (current != nullptr) {
     current = Pop(current, size);
   }
-  return current;
 }
 
 char* InputString() {
@@ -64,24 +63,18 @@ char* InputString() {
 
   char* string = new char[size + 1];
   memmove(string, start, size);
-  string[size] = '!';
+  string[size] = '\0';
   delete[] start;
   return string;
 }
 
-void Push(void**& current, size_t& size) {
-  SkipChars(3);
-
-  void** new_node = new void* [2];
-  new_node[0] = (void*)current;
-  new_node[1] = (void*)InputString();
+void Push(Node*& current, size_t& size) {
+  Node* new_node = new Node{ InputString(), current };
   current = new_node;
   ++size;
-
-  std::cout << "ok\n";
 }
 
-void RequestProcessing(void**& current, size_t& size, char symbol) {
+void RequestProcessing(Node*& current, size_t& size, char symbol) {
   if (symbol == 'b') { //back
     SkipChars(4);
     PrintBack(current);
@@ -92,14 +85,18 @@ void RequestProcessing(void**& current, size_t& size, char symbol) {
   }
   if (symbol == 'c') { //clear
     SkipChars(5);
-    current = Clear(current, size);
+    Clear(current, size);
+    current = nullptr;
     std::cout << "ok\n";
   }
   if (symbol == 'p') {
     symbol = getchar();
     if (symbol == 'u') { //push
+      SkipChars(3);
       Push(current, size);
-    } else { //pop
+      std::cout << "ok\n";
+    }
+    else { //pop
       SkipChars(2);
       PrintBack(current);
       current = Pop(current, size);
@@ -108,7 +105,7 @@ void RequestProcessing(void**& current, size_t& size, char symbol) {
 }
 
 int main() {
-  void** current = nullptr;
+  Node* current = nullptr;
   size_t size = 0;
 
   while (true) {
